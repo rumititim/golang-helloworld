@@ -1,11 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"net/http"
+	"os"
 
-func helloworld() string {
-	return "Hello World!!"
+	"github.com/joho/godotenv"
+)
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("<h1>Hello World!</h1>"))
 }
 
 func main() {
-	fmt.Println(helloworld())
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", indexHandler)
+	http.ListenAndServe(":"+port, mux)
 }
